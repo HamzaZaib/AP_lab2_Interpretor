@@ -1,5 +1,0 @@
-Let x=0
-Let y=1
-Let z=2
-x=y+2+z
-Print x

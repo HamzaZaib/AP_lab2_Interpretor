@@ -1,6 +1,8 @@
 
 import java.util.Arrays;
 
+import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
+
 
 
 /**
@@ -24,14 +26,16 @@ public class PostFixExpression {
 		char current,current1,current2;
 		for(int i=0;i<length;i++){
 			if(!first){
-				if(!Character.isDigit(infix.charAt(i))){
-					postfix.append(".");
+				if(!Character.isDigit(infix.charAt(i)) &&infix.charAt(i)!='.' ){
+					postfix.append(",");
 					first=true;
 				}
 			}
 			current=infix.charAt(i);
 			if(current==')'){
-                             current1=exp.pop();
+				current1=exp.pop();             
+				if(current1==' ')
+					return null;
 				while(current1!='(')
                 {
 					postfix.append(current1);
@@ -115,7 +119,7 @@ public class PostFixExpression {
 			else{
 				if(first){
 					first=false;
-					postfix.append(".");
+					postfix.append(",");
 				}
 				postfix.append(current);
 				
@@ -125,28 +129,32 @@ public class PostFixExpression {
 		return postfix.toString();
 	}
 	
-	public int postFixValue(String s){
+	public float postFixValue(String s){
 		//TODO implement this method
 		//String s=getPostFix();
+		if(s==null)
+			return -1;
 		StackArray numStack= new StackArray(s.length());
 		char current;
-		int operand1,operand2;
+		float operand1,operand2;
 		for(int i=0;i<s.length();i++){
 			current= s.charAt(i);
-			if(current=='.'){
+			if(current==','){
 				String value="";
 				i++;
-				while(Character.isDigit(s.charAt(i))){
+				while(Character.isDigit(s.charAt(i)) || s.charAt(i)=='.'){
 					value+=s.charAt(i);
 					i++;
 				}
-				numStack.push_num(Integer.parseInt(value));		
+				numStack.push_num(Float.parseFloat(value));		
 			}
 			//if(Character.isDigit(current))
 				//numStack.push_num((int)current-48);
 			else {
 				operand2=numStack.pop_num();
 				operand1=numStack.pop_num();
+				if(operand2==-1||operand1==-1)
+					return -1;
 				if(current=='+'){
 					numStack.push_num(operand1+operand2);
 				}
@@ -168,31 +176,32 @@ public class PostFixExpression {
 	public class StackArray {
 
 		private char s[];
-		private int top, top1, N, arr[];
+		private int top, top1, N;
+		private float arr[];
 
 		public StackArray(int num) {
 			N=num;
 			s = new char[N];
-			arr=new int[N];
+			arr=new float[N];
 			top = top1= 0;
 		}
 
 		public void push(char item) {
 			if (top == N) {
-				System.out.println("cannot push");
+				//System.out.println("cannot push");
 			} else
 				s[top++] = item;
 		}
-		public void push_num(int item) {
+		public void push_num(float item) {
 			if (top1 == N) {
-				System.out.println("cannot push num");
+				//System.out.println("cannot push num");
 			} else
 				arr[top1++] = item;
 		}
 
 		public char pop() {
 			if(isEmpty()){
-				System.out.println("Canot pop, Stack Empty!");
+				//System.out.println("Canot pop, Stack Empty!");
 				return ' ';
 			} else {
 				char temp = s[--top];
@@ -201,12 +210,12 @@ public class PostFixExpression {
 			}
 		}
 			
-		public int pop_num() {
+		public float pop_num() {
 				if(isEmpty_num()){
-					System.out.println("Canot pop num, Stack Empty!");
-					return 1;
+					//System.out.println("Canot pop num, Stack Empty!");
+					return -1;
 				} else {
-					int temp = arr[--top1];
+					float temp = arr[--top1];
 					arr[top1] = 0;
 
 					return temp;
